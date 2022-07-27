@@ -1,12 +1,14 @@
 package lesson7_connect_jdbc;
 
-import java.sql.DriverManager;
 import java.sql.Connection;
-import java.sql.SQLException;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import lesson5.SanPham;
 
-public class DemoConnect {
+public class DemoSelect {
     public static void main(String[] args) {
         try {
             // B1: Load Driver
@@ -22,24 +24,30 @@ public class DemoConnect {
             
             System.out.println("Kết nối thành công");
             
-            SanPham sp = new SanPham(0, "Ao 123", 10, 100000, "WHITE", 1);
-            String query = "INSERT INTO san_pham"
-                + "(ten, so_luong, mau_sac, don_gia, danh_muc_id) "
-                + "VALUES (?, ?, ?, ?, ?)";
-            //             1  2  3  4  5
+            ArrayList<SanPham> listSP = new ArrayList<>();
+            String query = "SELECT * FROM san_pham";
 
             // B3: Tạo PreparedStatement
             PreparedStatement ps = conn.prepareStatement(query);
             
             // B4: Gán giá trị tham số
-            ps.setString(1, sp.getTenSP());
-            ps.setInt(2, sp.getSoLuong());
-            ps.setString(3, sp.getMauSac());
-            ps.setDouble(4, sp.getDonGia());
-            ps.setInt(5, sp.getDanhMucId());
-            
             // B5: Thực thi
             ps.execute();
+            
+            ResultSet rs = ps.getResultSet();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String ten = rs.getString("ten");
+                String mauSac = rs.getString("mau_sac");
+                int soLg = rs.getInt("so_luong");
+                double donGia = rs.getDouble("don_gia");
+                int danhMucId = rs.getInt("danh_muc_id");
+                
+                SanPham sp = new SanPham(id, ten, soLg,
+                    donGia, mauSac, danhMucId);
+                listSP.add(sp);
+            }
+            
             System.out.println("Thực thi thành công");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
